@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisador Pro - Sistema Completo com Importador</title>
+    <title>Analisador Pro - Versão Final</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #2563eb; --danger: #ef4444; --success: #22c55e; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --border: #e2e8f0; }
@@ -14,7 +14,7 @@
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
         .card { background: var(--card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid var(--border); }
         .card h2 { font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: var(--primary); }
-        textarea { width: 100%; height: 100px; border: 1px solid var(--border); border-radius: 8px; padding: 10px; resize: none; margin-bottom: 10px; font-size: 14px; }
+        textarea { width: 100%; height: 80px; border: 1px solid var(--border); border-radius: 8px; padding: 10px; resize: none; margin-bottom: 10px; font-size: 14px; }
         button { width: 100%; padding: 12px; border: none; border-radius: 8px; background: var(--primary); color: white; font-weight: 600; cursor: pointer; transition: opacity 0.2s; }
         button:hover { opacity: 0.9; }
         .btn-secondary { background: #64748b; margin-top: 10px; }
@@ -24,21 +24,20 @@
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .stat-box { background: #f8fafc; padding: 15px; border-radius: 8px; text-align: center; }
         .stat-val { font-size: 1.5rem; font-weight: 700; display: block; }
-        .alerta-forte { background: #fef2f2; border: 2px solid var(--danger); color: var(--danger); padding: 15px; border-radius: 8px; margin-top: 20px; text-align: center; animation: pulse 2s infinite; font-weight: bold; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
+        .alerta-forte { background: #fef2f2; border: 2px solid var(--danger); color: var(--danger); padding: 15px; border-radius: 8px; margin-top: 20px; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="header">
     <h1>Analisador Estratégico Pro</h1>
-    <p>Painel Inteligente com Importação Direta</p>
+    <p>Gestão Profissional de Dados</p>
 </div>
 
 <div class="dashboard">
     <div class="card">
-        <h2>📥 Entrada de Resultados</h2>
-        <textarea id="inputResultados" placeholder="Cole aqui os milhares..."></textarea>
+        <h2>📥 Resultados</h2>
+        <textarea id="inputResultados" placeholder="Cole os milhares aqui..."></textarea>
         <div style="display: flex; gap: 10px;">
             <button onclick="processarResultados('rio')">Lançar Rio</button>
             <button onclick="processarResultados('look')" style="background: #7c3aed;">Lançar Look</button>
@@ -46,7 +45,7 @@
     </div>
 
     <div class="card">
-        <h2>📊 Ciclo Automático</h2>
+        <h2>📊 Ciclo</h2>
         <div class="stats-grid">
             <div class="stat-box"> <span class="stat-val" id="fechados">0</span> Saíram </div>
             <div class="stat-box"> <span class="stat-val" id="faltam">25</span> Faltam </div>
@@ -69,31 +68,138 @@
     </div>
 
     <div class="card">
-        <h2>💡 Sugestão Estratégica</h2>
-        <div id="painelSugestao"> <p>Aguardando dados...</p> </div>
+        <h2>💡 Sugestão</h2>
+        <div id="painelSugestao"></div>
         <div id="alertaGrave"></div>
     </div>
 
     <div class="card">
-        <h2>🕒 Histórico e Backup</h2>
-        <h3 style="font-size: 0.8rem;">Rio</h3>
-        <div class="badge-list" id="historicoRio"></div>
-        <h3 style="font-size: 0.8rem; margin-top:10px;">Look</h3>
-        <div class="badge-list" id="historicoLook"></div>
+        <h2>💾 Backup e Histórico</h2>
+        <div style="margin-bottom: 15px;">
+            <h3 style="font-size: 0.8rem;">Rio:</h3>
+            <div class="badge-list" id="historicoRio"></div>
+            <h3 style="font-size: 0.8rem; margin-top:10px;">Look:</h3>
+            <div class="badge-list" id="historicoLook"></div>
+        </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
-            <button class="btn-secondary" onclick="exportarBackup()">💾 Exportar (.txt)</button>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <button onclick="exportarBackup()" style="background: #059669;">💾 Exportar</button>
             
-            <button class="btn-secondary" style="background:#0ea5e9" onclick="document.getElementById('fileInput').click()">📂 Importar (.txt)</button>
+            <button onclick="document.getElementById('fileInput').click()" style="background: #0ea5e9;">📂 Importar</button>
             <input type="file" id="fileInput" style="display:none" accept=".txt" onchange="lerArquivoBackup(event)">
         </div>
-        <button class="btn-secondary" onclick="limparTudo()" style="background:#fff; color:#ef4444; border:1px solid #ef4444; margin-top:10px">⚠️ Limpar Tudo</button>
+
+        <button onclick="limparTudo()" class="btn-secondary" style="background:#fff; color:#ef4444; border:1px solid #ef4444;">⚠️ Limpar Tudo</button>
     </div>
 </div>
 
 <script>
     const animais = ["Avestruz", "Águia", "Burro", "Borboleta", "Cachorro", "Cabra", "Carneiro", "Camelo", "Cobra", "Coelho", "Cavalo", "Elefante", "Galo", "Gato", "Jacaré", "Leão", "Macaco", "Porco", "Pavão", "Peru", "Touro", "Tigre", "Urso", "Veado", "Vaca"];
     
-    let dados = JSON.parse(localStorage.getItem('bicho_v4')) || { rio: [], look: [], atrasadosRio: [], atrasadosLook: [], historicoGlobal: [] };
+    let dados = JSON.parse(localStorage.getItem('bicho_final_v1')) || { rio: [], look: [], atrasadosRio: [], atrasadosLook: [], historicoGlobal: [] };
 
-    function salvar() { localStorage.setItem('bicho_v4', JSON.
+    function salvar() { localStorage.setItem('bicho_final_v1', JSON.stringify(dados)); atualizarInterface(); }
+
+    function converterParaGrupo(milhar) {
+        let dezena = parseInt(milhar.toString().slice(-2));
+        if (isNaN(dezena)) return null;
+        let grupo = Math.ceil(dezena / 4);
+        return dezena === 0 ? 25 : (grupo === 0 ? 25 : grupo);
+    }
+
+    function processarResultados(tipo) {
+        const input = document.getElementById('inputResultados').value;
+        const numeros = input.match(/\d{4}/g);
+        if (numeros) {
+            numeros.slice(0, 7).forEach(m => {
+                const g = converterParaGrupo(m);
+                if (g) { dados[tipo].unshift(g); dados.historicoGlobal.push(g); }
+            });
+            document.getElementById('inputResultados').value = '';
+            salvar();
+        }
+    }
+
+    function importarListaAtrasados(tipo) {
+        const input = document.getElementById(tipo === 'rio' ? 'inputAtrasadosRio' : 'inputAtrasadosLook').value;
+        const grupos = input.match(/\b(0?[1-9]|1[0-9]|2[0-5])\b/g);
+        if (grupos) {
+            const listaUnica = [...new Set(grupos.map(Number))];
+            if (tipo === 'rio') dados.atrasadosRio = listaUnica;
+            else dados.atrasadosLook = listaUnica;
+            salvar();
+        }
+    }
+
+    function removerItem(tipo, index) { dados[tipo].splice(index, 1); salvar(); }
+
+    function atualizarInterface() {
+        renderLista('historicoRio', dados.rio, 'rio');
+        renderLista('historicoLook', dados.look, 'look');
+        renderLista('badgesRio', dados.atrasadosRio, 'atrasadosRio');
+        renderLista('badgesLook', dados.atrasadosLook, 'atrasadosLook');
+        const unicos = [...new Set(dados.historicoGlobal)];
+        const faltantes = [];
+        for(let i=1; i<=25; i++) if(!unicos.includes(i)) faltantes.push(i);
+        document.getElementById('fechados').innerText = unicos.length;
+        document.getElementById('faltam').innerText = 25 - unicos.length;
+        let htmlFaltam = '';
+        faltantes.forEach(g => htmlFaltam += `<span class="badge" style="color:var(--danger)">${g}</span>`);
+        document.getElementById('listaFaltantes').innerHTML = htmlFaltam || 'Ciclo Completo';
+        gerarSugestao(faltantes);
+    }
+
+    function renderLista(id, lista, tipo) {
+        const div = document.getElementById(id);
+        div.innerHTML = '';
+        lista.slice(0, 15).forEach((g, index) => {
+            div.innerHTML += `<span class="badge">${g} <span class="remove-btn" onclick="removerItem('${tipo}', ${index})">×</span></span>`;
+        });
+    }
+
+    function gerarSugestao(faltantes) {
+        const painel = document.getElementById('painelSugestao');
+        const alerta = document.getElementById('alertaGrave');
+        if (dados.atrasadosRio.length > 0 && dados.atrasadosLook.length > 0) {
+            const r = dados.atrasadosRio[0];
+            const l = dados.atrasadosLook[0];
+            const apo = dados.historicoGlobal[dados.historicoGlobal.length - 1] || "?";
+            painel.innerHTML = `<div class="stat-box" style="text-align:left"><strong>Rio:</strong> ${r} (${animais[r-1]})<br><strong>Look:</strong> ${l} (${animais[l-1]})<br><strong>Apoio:</strong> ${apo}</div>`;
+            if (faltantes.includes(r)) alerta.innerHTML = `<div class="alerta-forte">🚨 ALERTA: Grupo ${r} no Ciclo!</div>`;
+            else alerta.innerHTML = '';
+        }
+    }
+
+    function exportarBackup() {
+        const txt = `[BACKUP]\nRIO: [${dados.rio}]\nLOOK: [${dados.look}]\nHISTORICO: [${dados.historicoGlobal}]`;
+        const blob = new Blob([txt], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `backup.txt`;
+        a.click();
+    }
+
+    function lerArquivoBackup(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const txt = e.target.result;
+            const processar = (chave) => {
+                const reg = new RegExp(chave + ":\\s*\\[?([\\d,\\s]*)\\]?");
+                const m = txt.match(reg);
+                return m ? m[1].split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n)) : [];
+            };
+            dados.rio = processar("RIO");
+            dados.look = processar("LOOK");
+            dados.historicoGlobal = processar("HISTORICO");
+            salvar();
+            alert("Backup importado!");
+        };
+        reader.readAsText(file);
+    }
+
+    function limparTudo() { if(confirm("Apagar tudo?")) { dados={rio:[],look:[],atrasadosRio:[],atrasadosLook:[],historicoGlobal:[]}; salvar(); } }
+    atualizarInterface();
+</script>
+</body>
+</html>
