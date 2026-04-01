@@ -2,202 +2,148 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisador Pro - Sistema de Segurança Total</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SABA v13.9 - FULL BACKUP</title>
     <style>
-        :root { --primary: #2563eb; --danger: #ef4444; --success: #22c55e; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --border: #e2e8f0; }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding: 15px; font-size: 14px; }
-        .header { text-align: center; margin-bottom: 20px; }
-        .header h1 { color: var(--primary); font-size: 1.6rem; text-transform: uppercase; }
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 15px; max-width: 1200px; margin: 0 auto; }
-        .card { background: var(--card); border-radius: 10px; padding: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        .card h2 { font-size: 1rem; margin-bottom: 12px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-        textarea { width: 100%; height: 70px; border: 1px solid var(--border); border-radius: 6px; padding: 8px; resize: none; margin-bottom: 8px; }
-        button { width: 100%; padding: 10px; border: none; border-radius: 6px; background: var(--primary); color: white; font-weight: 600; cursor: pointer; }
-        .btn-rio { background: #2563eb; }
-        .btn-look { background: #7c3aed; }
-        .btn-import { background: #0ea5e9; }
-        .btn-export { background: #059669; }
-        .badge-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-        .badge { background: #f1f5f9; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; border: 1px solid #e2e8f0; }
-        .remove-btn { color: var(--danger); cursor: pointer; margin-left: 4px; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-        .stat-box { background: #f8fafc; padding: 10px; border-radius: 6px; text-align: center; border: 1px solid var(--border); }
-        .stat-val { font-size: 1.2rem; font-weight: 800; display: block; color: var(--primary); }
-        .alerta-forte { background: #fef2f2; border: 2px solid var(--danger); color: var(--danger); padding: 10px; border-radius: 6px; margin-top: 10px; text-align: center; font-weight: bold; }
+        :root { --blue: #1a73e8; --red: #d93025; --green: #188038; --dark: #202124; }
+        body { font-family: -apple-system, sans-serif; background: #f1f3f4; margin: 0; padding: 10px; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 15px; border-radius: 12px; border-top: 6px solid var(--blue); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .toolbar { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
+        .btn-tool { cursor: pointer; border: 1px solid #dadce0; border-radius: 6px; padding: 10px; font-weight: bold; font-size: 10px; background: white; flex: 1; }
+        .card { border: 1px solid #dadce0; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+        h3 { color: var(--blue); margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #eee; }
+        textarea { width: 100%; height: 70px; border: 1px solid #bdc1c6; border-radius: 6px; padding: 8px; font-size: 14px; box-sizing: border-box; resize: none; background: #fff; }
+        .h-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        input { width: 100%; padding: 8px; border: 1px solid #bdc1c6; border-radius: 6px; text-align: center; font-weight: bold; font-size: 16px; box-sizing: border-box; }
+        .btn-exec { background: var(--blue); color: white; width: 100%; padding: 16px; font-size: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #1557b0; }
+        .panel { background: #e8f5e9; border: 2px solid var(--green); padding: 10px; border-radius: 8px; margin-top: 15px; display: none; }
+        .t-item { background: white; border: 1px solid var(--green); padding: 12px; border-radius: 6px; text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 8px; letter-spacing: 2px; }
     </style>
 </head>
-<body>
+<body onload="carregarDB()">
 
-<div class="header">
-    <h1>Analisador Estratégico Pro</h1>
-</div>
+<div class="container">
+    <div class="toolbar">
+        <button class="btn-tool" onclick="fazerBackup()">💾 EXPORTAR TUDO</button>
+        <button class="btn-tool" onclick="document.getElementById('fIn').click()">📂 IMPORTAR TUDO</button>
+        <input type="file" id="fIn" style="display:none" onchange="restaurarBackup(event)">
+        <button class="btn-tool" style="color:var(--red)" onclick="resetarSistema()">🧨 LIMPAR</button>
+    </div>
 
-<div class="dashboard">
     <div class="card">
-        <h2>📥 Lançar Resultados</h2>
-        <textarea id="inputResultados" placeholder="Cole os milhares aqui..."></textarea>
-        <div style="display: flex; gap: 8px;">
-            <button class="btn-rio" onclick="lancar('rio')">Rio</button>
-            <button class="btn-look" onclick="lancar('look')">Look</button>
+        <h3>📊 BANCO DE DADOS</h3>
+        <textarea id="txtAt" placeholder="Ciclo (Atrasados)..."></textarea>
+        <textarea id="txtVi" style="margin-top:5px; border-color:var(--blue)" placeholder="Dezenas Viciadas..."></textarea>
+    </div>
+
+    <div class="card">
+        <h3>🕒 RESULTADOS DO DIA</h3>
+        <div class="h-grid">
+            <input type="number" id="h1" placeholder="COR">
+            <input type="number" id="h2" placeholder="PPT">
+            <input type="number" id="h3" placeholder="PTM">
+            <input type="number" id="h4" placeholder="PT">
+            <input type="number" id="h5" placeholder="PTV">
+            <input type="number" id="h6" placeholder="PTN">
         </div>
+        <input type="text" id="txtEx" style="margin-top:8px; font-size:12px;" placeholder="Dezenas para Excluir hoje">
     </div>
 
-    <div class="card">
-        <h2>📊 Ciclo de 25</h2>
-        <div class="stats">
-            <div class="stat-box"> <span class="stat-val" id="fechados">0</span> Saíram </div>
-            <div class="stat-box"> <span class="stat-val" id="faltam">25</span> Faltam </div>
-        </div>
-        <div class="badge-list" id="listaFaltantes"></div>
-    </div>
+    <button class="btn-exec" onclick="processarGeral()">GERAR JOGOS (V13.9)</button>
 
-    <div class="card">
-        <h2>🏛️ Atrasados Rio</h2>
-        <textarea id="inRioAtr" placeholder="Cole a lista de atrasados do Rio..."></textarea>
-        <button style="background:#64748b" onclick="importarLista('rio')">Definir Ordem Rio</button>
-        <div class="badge-list" id="viewRioAtr"></div>
-    </div>
-
-    <div class="card">
-        <h2>👁️ Atrasados Look</h2>
-        <textarea id="inLookAtr" placeholder="Cole a lista de atrasados da Look..."></textarea>
-        <button style="background:#64748b" onclick="importarLista('look')">Definir Ordem Look</button>
-        <div class="badge-list" id="viewLookAtr"></div>
-    </div>
-
-    <div class="card">
-        <h2>💡 Sugestão</h2>
-        <div id="painelSugestao">Configure os atrasados acima.</div>
-        <div id="alertaGrave"></div>
-    </div>
-
-    <div class="card">
-        <h2>💾 Backup Completo</h2>
-        <div style="margin-bottom:10px">
-            <strong>Últimos Rio:</strong> <div id="histRio" class="badge-list"></div>
-            <strong style="display:block; margin-top:10px">Últimos Look:</strong> <div id="histLook" class="badge-list"></div>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px;">
-            <button class="btn-export" onclick="exportar()">💾 Exportar Tudo</button>
-            <button class="btn-import" onclick="document.getElementById('fileIn').click()">📂 Importar Tudo</button>
-            <input type="file" id="fileIn" style="display:none" accept=".txt" onchange="importarArquivo(event)">
-        </div>
-        <button onclick="limpar()" style="background:none; color:red; border:1px solid red; margin-top:10px; padding:5px; font-size:11px">Apagar Tudo</button>
+    <div id="painelPalpite" class="panel">
+        <h3 style="color:var(--green)">🎯 PALPITES TÉCNICOS (SEM REPETIÇÃO)</h3>
+        <div id="gridPalpites"></div>
     </div>
 </div>
 
 <script>
-    const bichos = ["Avestruz","Águia","Burro","Borboleta","Cachorro","Cabra","Carneiro","Camelo","Cobra","Coelho","Cavalo","Elefante","Galo","Gato","Jacaré","Leão","Macaco","Porco","Pavão","Peru","Touro","Tigre","Urso","Veado","Vaca"];
-    
-    // Memória do sistema
-    let db = JSON.parse(localStorage.getItem('bicho_v10')) || { rio: [], look: [], atrRio: [], atrLook: [], global: [] };
+    let db = { ciclo: [], viciadas: "" };
+    const KEY = "SABA_GOLD_139";
 
-    function salvar() {
-        localStorage.setItem('bicho_v10', JSON.stringify(db));
-        atualizar();
-    }
-
-    function converter(m) {
-        let d = parseInt(m.toString().slice(-2));
-        if (isNaN(d)) return null;
-        let g = Math.ceil(d / 4);
-        return d === 0 ? 25 : (g === 0 ? 25 : g);
-    }
-
-    function lancar(t) {
-        const val = document.getElementById('inputResultados').value;
-        const nums = val.match(/\d{4}/g);
-        if (nums) {
-            nums.slice(0, 7).forEach(n => {
-                let g = converter(n);
-                if (g) { db[t].unshift(g); db.global.push(g); }
-            });
-            document.getElementById('inputResultados').value = '';
-            salvar();
+    function carregarDB() {
+        const d = localStorage.getItem(KEY);
+        if(d) {
+            db = JSON.parse(d);
+            document.getElementById('txtAt').value = db.ciclo.join(" ");
+            document.getElementById('txtVi').value = db.viciadas || "";
         }
     }
 
-    function importarLista(t) {
-        const id = t === 'rio' ? 'inRioAtr' : 'inLookAtr';
-        const val = document.getElementById(id).value;
-        const grupos = val.match(/\b(0?[1-9]|1[0-9]|2[0-5])\b/g);
-        if (grupos) {
-            db[t === 'rio' ? 'atrRio' : 'atrLook'] = [...new Set(grupos.map(Number))];
-            document.getElementById(id).value = '';
-            salvar();
-        }
+    function getG(d) {
+        let n = parseInt(d);
+        return (n === 0 || n === 100) ? 25 : Math.ceil(n/4);
     }
 
-    function remover(t, i) { db[t].splice(i, 1); salvar(); }
+    function aplicarEspelho(d) {
+        let s = d.toString().padStart(2, '0');
+        let n = parseInt(s.split('').reverse().join(''));
+        return n > 99 ? Math.abs(n - 50) : n;
+    }
 
-    function atualizar() {
-        const render = (id, lista, tipo) => {
-            document.getElementById(id).innerHTML = lista.slice(0, 15).map((g, idx) => 
-                `<span class="badge">${g}<span class="remove-btn" onclick="remover('${tipo}', ${idx})">×</span></span>`).join('');
-        };
+    function processarGeral() {
+        // Captura e Salva no DB Local
+        let at = (document.getElementById('txtAt').value.match(/\d+/g) || []).map(Number);
+        if(at.length > 0) db.ciclo = [...new Set(at)];
+        db.viciadas = document.getElementById('txtVi').value;
 
-        render('histRio', db.rio, 'rio');
-        render('histLook', db.look, 'look');
-        render('viewRioAtr', db.atrRio, 'atrRio');
-        render('viewLookAtr', db.atrLook, 'atrLook');
+        // Processa Resultados h1-h6
+        for(let i=1; i<=6; i++) {
+            let v = parseInt(document.getElementById('h'+i).value);
+            if(!isNaN(v)) { db.ciclo = db.ciclo.filter(x => x !== v); db.ciclo.push(v); }
+            document.getElementById('h'+i).value = "";
+        }
 
-        const unicos = [...new Set(db.global)];
-        const faltam = [];
-        for(let i=1; i<=25; i++) if(!unicos.includes(i)) faltam.push(i);
+        const viRaw = [...new Set((db.viciadas.match(/\d+/g) || []).map(Number))];
+        const jaSairam = (document.getElementById('txtEx').value.match(/\d+/g) || []).map(Number);
         
-        document.getElementById('fechados').innerText = unicos.length;
-        document.getElementById('faltam').innerText = 25 - unicos.length;
-        document.getElementById('listaFaltantes').innerHTML = faltam.map(g => `<span class="badge" style="color:red">${g}</span>`).join('');
+        let pool = viRaw.filter(d => !jaSairam.includes(d));
+        let topo = db.ciclo.slice(0, 10);
+        let lista = [...new Set([...pool.filter(d => topo.includes(getG(d))), ...pool])];
 
-        if (db.atrRio.length > 0 && db.atrLook.length > 0) {
-            let r = db.atrRio[0], l = db.atrLook[0];
-            document.getElementById('painelSugestao').innerHTML = `<strong>Rio:</strong> ${r} (${bichos[r-1]}) | <strong>Look:</strong> ${l} (${bichos[l-1]})`;
-            document.getElementById('alertaGrave').innerHTML = faltam.includes(r) ? `<div class="alerta-forte">🚨 GRUPO ${r} EM ATRASO NO CICLO!</div>` : '';
-        }
-    }
-
-    // --- SISTEMA DE BACKUP REFEITO E TESTADO ---
-    function exportar() {
-        // Criamos um objeto com tudo dentro
-        const backup = JSON.stringify(db);
-        const blob = new Blob([backup], { type: 'text/plain' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `backup_completo_analisador.txt`;
-        a.click();
-    }
-
-    function importarArquivo(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const conteudo = e.target.result;
-                const dadosImportados = JSON.parse(conteudo);
-                
-                // Verificação de segurança: se o arquivo tem o que precisamos
-                if (dadosImportados.rio && dadosImportados.look && dadosImportados.global) {
-                    db = dadosImportados; // Substitui tudo na memória
-                    salvar(); // Grava no navegador e atualiza a tela
-                    alert("✅ TUDO RECUPERADO: Rio, Look e Histórico estão de volta!");
-                } else {
-                    alert("❌ Erro: Este arquivo não parece ser um backup válido.");
-                }
-            } catch (err) {
-                alert("❌ Erve: Ocorreu um erro ao ler o arquivo. Certifique-se de que é o arquivo .txt gerado pelo sistema.");
+        let html = "";
+        for(let j=0; j<4; j++) {
+            if(lista.length < 3) break;
+            let jogo = [];
+            let gps = [];
+            
+            while(jogo.length < 3 && lista.length > 0) {
+                let d = lista.shift();
+                let g = getG(d);
+                if(jogo.includes(d) || gps.includes(g)) d = aplicarEspelho(d);
+                jogo.push(d);
+                gps.push(getG(d));
             }
-        };
-        reader.readAsText(file);
+            html += `<div class="t-item">JOGO ${j+1}: ${jogo.map(n=>n.toString().padStart(2,'0')).join(' - ')}</div>`;
+        }
+
+        document.getElementById('painelPalpite').style.display = 'block';
+        document.getElementById('gridPalpites').innerHTML = html;
+        
+        // Atualiza campos e Salva
+        document.getElementById('txtAt').value = db.ciclo.join(" ");
+        localStorage.setItem(KEY, JSON.stringify(db));
+        alert("Dados Sincronizados e Salvos!");
     }
 
-    function limpar() { if(confirm("Apagar tudo?")) { db={rio:[],look:[],atrRio:[],atrLook:[],global:[]}; salvar(); } }
-    atualizar();
-</script>
+    function fazerBackup() {
+        db.viciadas = document.getElementById('txtVi').value; // Garante que pegou o texto atual
+        const b = new Blob([JSON.stringify(db)], {type: "application/json"});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "BACKUP_SABA_TOTAL.json"; a.click();
+    }
 
+    function restaurarBackup(e) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            db = JSON.parse(ev.target.result);
+            localStorage.setItem(KEY, JSON.stringify(db));
+            alert("✅ TUDO RESTAURADO!");
+            location.reload();
+        };
+        reader.readAsText(e.target.files[0]);
+    }
+
+    function resetarSistema() { if(confirm("Apagar tudo?")) { localStorage.removeItem(KEY); location.reload(); } }
+</script>
 </body>
 </html>
