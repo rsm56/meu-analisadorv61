@@ -3,67 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SABA v14.1 - ESTÁVEL</title>
+    <title>SABA v14.2 - GITHUB READY</title>
     <style>
-        :root { --blue: #1a73e8; --red: #d93025; --green: #188038; --dark: #202124; }
+        :root { --blue: #1a73e8; --red: #d93025; --green: #188038; }
         body { font-family: -apple-system, sans-serif; background: #f1f3f4; margin: 0; padding: 10px; }
         .container { max-width: 600px; margin: auto; background: white; padding: 15px; border-radius: 12px; border-top: 6px solid var(--blue); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .toolbar { display: flex; gap: 5px; margin-bottom: 15px; flex-wrap: wrap; }
-        .btn-tool { cursor: pointer; border: 1px solid #dadce0; border-radius: 6px; padding: 10px; font-weight: bold; font-size: 10px; background: white; flex: 1; }
+        .btn-tool { cursor: pointer; border: 1px solid #dadce0; border-radius: 6px; padding: 8px; font-weight: bold; font-size: 10px; background: white; flex: 1; }
         .card { border: 1px solid #dadce0; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
-        h3 { color: var(--blue); margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #eee; }
-        textarea { width: 100%; height: 70px; border: 1px solid #bdc1c6; border-radius: 6px; padding: 8px; font-size: 14px; box-sizing: border-box; resize: none; }
+        textarea { width: 100%; height: 70px; border: 1px solid #bdc1c6; border-radius: 6px; padding: 8px; font-size: 14px; box-sizing: border-box; resize: none; margin-top: 5px; }
         .h-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-        input { width: 100%; padding: 8px; border: 1px solid #bdc1c6; border-radius: 6px; text-align: center; font-weight: bold; font-size: 16px; box-sizing: border-box; }
-        .btn-exec { background: var(--blue); color: white; width: 100%; padding: 16px; font-size: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #1557b0; }
+        input { width: 100%; padding: 10px; border: 1px solid #bdc1c6; border-radius: 6px; text-align: center; font-weight: bold; font-size: 16px; box-sizing: border-box; }
+        .btn-exec { background: var(--blue); color: white; width: 100%; padding: 18px; font-size: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; }
         .panel { background: #e8f5e9; border: 2px solid var(--green); padding: 10px; border-radius: 8px; margin-top: 15px; display: none; }
         .t-item { background: white; border: 1px solid var(--green); padding: 12px; border-radius: 6px; text-align: center; font-size: 20px; font-weight: bold; margin-bottom: 8px; letter-spacing: 2px; }
+        .status-bar { font-size: 10px; color: #666; text-align: center; margin-bottom: 10px; }
     </style>
 </head>
 <body onload="carregarDB()">
 
 <div class="container">
+    <div class="status-bar" id="statusMemoria">Memória: Vazia</div>
+    
     <div class="toolbar">
-        <button class="btn-tool" onclick="fazerBackup()">💾 EXPORTAR TUDO</button>
-        <button class="btn-tool" onclick="document.getElementById('fIn').click()">📂 IMPORTAR TUDO</button>
+        <button class="btn-tool" onclick="fazerBackup()">💾 EXPORTAR</button>
+        <button class="btn-tool" onclick="document.getElementById('fIn').click()">📂 IMPORTAR</button>
         <input type="file" id="fIn" style="display:none" onchange="restaurarBackup(event)">
-        <button class="btn-tool" onclick="alert('Na Memória: ' + db.ciclo.length + ' grupos e ' + db.viciadas.length + ' dezenas.')">👁️ STATUS</button>
-        <button class="btn-tool" style="color:var(--red)" onclick="resetarSistema()">🧨 ZERAR</button>
+        <button class="btn-tool" style="color:var(--red)" onclick="resetarSistema()">🧨 ZERAR TUDO</button>
     </div>
 
     <div class="card">
-        <h3>📊 ENTRADA (LIMPA APÓS GERAR)</h3>
+        <h3 style="font-size:12px; margin:0">📊 ENTRADA DE DADOS</h3>
         <textarea id="txtAt" placeholder="Novos Grupos Atrasados..."></textarea>
-        <textarea id="txtVi" style="margin-top:5px; border-color:var(--blue)" placeholder="Novas Dezenas Viciadas..."></textarea>
+        <textarea id="txtVi" style="border-color:var(--blue)" placeholder="Novas Dezenas Viciadas..."></textarea>
     </div>
 
     <div class="card">
-        <h3>🕒 RESULTADOS</h3>
-        <div class="h-grid">
-            <input type="number" id="h1" placeholder="COR">
-            <input type="number" id="h2" placeholder="PPT">
-            <input type="number" id="h3" placeholder="PTM">
-            <input type="number" id="h4" placeholder="PT">
-            <input type="number" id="h5" placeholder="PTV">
-            <input type="number" id="h6" placeholder="PTN">
+        <h3 style="font-size:12px; margin:0">🕒 RESULTADOS (SAÍDAS)</h3>
+        <div class="h-grid" style="margin-top:5px">
+            <input type="number" id="h1" placeholder="R1">
+            <input type="number" id="h2" placeholder="R2">
+            <input type="number" id="h3" placeholder="R3">
+            <input type="number" id="h4" placeholder="R4">
+            <input type="number" id="h5" placeholder="R5">
+            <input type="number" id="h6" placeholder="R6">
         </div>
     </div>
 
-    <button class="btn-exec" onclick="processarGeral()">GERAR JOGOS & LIMPAR</button>
+    <button class="btn-exec" onclick="processarGeral()">GERAR JOGOS & SALVAR</button>
 
     <div id="painelPalpite" class="panel">
-        <h3 style="color:var(--green)">🎯 PALPITES v14.1</h3>
+        <h3 style="color:var(--green); font-size:12px; margin:0 0 10px 0">🎯 PALPITES GERADOS</h3>
         <div id="gridPalpites"></div>
     </div>
 </div>
 
 <script>
     let db = { ciclo: [], viciadas: [] };
-    const KEY = "SABA_V14_1_MASTER";
+    const KEY = "SABA_V14_2_FINAL";
 
     function carregarDB() {
         const data = localStorage.getItem(KEY);
-        if(data) db = JSON.parse(data);
+        if(data) {
+            db = JSON.parse(data);
+            atualizarStatus();
+        }
+    }
+
+    function atualizarStatus() {
+        document.getElementById('statusMemoria').innerText = 
+            `Memória: ${db.ciclo.length} grupos / ${db.viciadas.length} viciadas salvas.`;
     }
 
     function getG(d) {
@@ -78,14 +87,14 @@
     }
 
     function processarGeral() {
-        // 1. Captura e Atualiza Memória
         let valAt = document.getElementById('txtAt').value;
         let valVi = document.getElementById('txtVi').value;
 
+        // 1. Atualiza se houver novos dados
         if(valAt.trim() !== "") db.ciclo = [...new Set((valAt.match(/\d+/g) || []).map(Number))];
         if(valVi.trim() !== "") db.viciadas = [...new Set((valVi.match(/\d+/g) || []).map(Number))];
 
-        // 2. Processa Resultados h1-h6
+        // 2. Processa Resultados
         for(let i=1; i<=6; i++) {
             let el = document.getElementById('h'+i);
             let v = parseInt(el.value);
@@ -93,15 +102,15 @@
                 db.ciclo = db.ciclo.filter(x => x !== v);
                 db.ciclo.push(v);
             }
-            el.value = ""; // Limpa input
+            el.value = "";
         }
 
-        // Salva imediatamente
+        // 3. SALVAMENTO CRÍTICO (Antes de qualquer outra coisa)
         localStorage.setItem(KEY, JSON.stringify(db));
+        atualizarStatus();
 
-        // 3. Validação de Segurança
         if(db.viciadas.length < 3) {
-            alert("Erro: Insira dezenas viciadas primeiro.");
+            alert("ERRO: O Banco está vazio. Importe um backup ou cole as dezenas viciadas.");
             return;
         }
 
@@ -125,30 +134,25 @@
             html += `<div class="t-item">JOGO ${j+1}: ${jogo.map(n=>n.toString().padStart(2,'0')).join(' - ')}</div>`;
         }
 
-        // 5. Interface e Limpeza Final
         document.getElementById('painelPalpite').style.display = 'block';
         document.getElementById('gridPalpites').innerHTML = html;
+        
+        // 5. Limpeza de campos para nova entrada
         document.getElementById('txtAt').value = "";
         document.getElementById('txtVi').value = "";
         
-        alert("Sucesso! Jogos gerados e campos limpos.");
+        console.log("Dados persistidos com sucesso.");
     }
 
     function fazerBackup() {
-        if(db.ciclo.length === 0 && db.viciadas.length === 0) {
-            alert("Nada para exportar.");
-            return;
-        }
         const b = new Blob([JSON.stringify(db)], {type: "application/json"});
         const a = document.createElement('a');
         a.href = URL.createObjectURL(b);
-        a.download = "SABA_DATABASE.json";
+        a.download = "SABA_BACKUP_MESTRE.json";
         a.click();
     }
 
     function restaurarBackup(e) {
-        const file = e.target.files[0];
-        if(!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
             try {
@@ -156,18 +160,16 @@
                 if(data.ciclo && data.viciadas) {
                     db = data;
                     localStorage.setItem(KEY, JSON.stringify(db));
-                    alert("✅ TUDO RESTAURADO!");
+                    alert("✅ BANCO RESTAURADO COM SUCESSO!");
                     location.reload();
-                } else {
-                    alert("Arquivo com formato inválido.");
                 }
-            } catch(err) { alert("Erro ao ler arquivo."); }
+            } catch(err) { alert("Arquivo inválido."); }
         };
-        reader.readAsText(file);
+        reader.readAsText(e.target.files[0]);
     }
 
     function resetarSistema() {
-        if(confirm("Isso apagará todo o histórico. Confirmar?")) {
+        if(confirm("ATENÇÃO: Isso apaga a memória do navegador. Tem certeza?")) {
             localStorage.removeItem(KEY);
             location.reload();
         }
