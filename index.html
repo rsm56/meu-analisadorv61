@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SABA v13.9 - FULL BACKUP</title>
+    <title>SABA v14.1 - ESTÁVEL</title>
     <style>
         :root { --blue: #1a73e8; --red: #d93025; --green: #188038; --dark: #202124; }
         body { font-family: -apple-system, sans-serif; background: #f1f3f4; margin: 0; padding: 10px; }
@@ -12,7 +12,7 @@
         .btn-tool { cursor: pointer; border: 1px solid #dadce0; border-radius: 6px; padding: 10px; font-weight: bold; font-size: 10px; background: white; flex: 1; }
         .card { border: 1px solid #dadce0; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
         h3 { color: var(--blue); margin: 0 0 8px 0; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #eee; }
-        textarea { width: 100%; height: 70px; border: 1px solid #bdc1c6; border-radius: 6px; padding: 8px; font-size: 14px; box-sizing: border-box; resize: none; background: #fff; }
+        textarea { width: 100%; height: 70px; border: 1px solid #bdc1c6; border-radius: 6px; padding: 8px; font-size: 14px; box-sizing: border-box; resize: none; }
         .h-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
         input { width: 100%; padding: 8px; border: 1px solid #bdc1c6; border-radius: 6px; text-align: center; font-weight: bold; font-size: 16px; box-sizing: border-box; }
         .btn-exec { background: var(--blue); color: white; width: 100%; padding: 16px; font-size: 16px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #1557b0; }
@@ -27,17 +27,18 @@
         <button class="btn-tool" onclick="fazerBackup()">💾 EXPORTAR TUDO</button>
         <button class="btn-tool" onclick="document.getElementById('fIn').click()">📂 IMPORTAR TUDO</button>
         <input type="file" id="fIn" style="display:none" onchange="restaurarBackup(event)">
-        <button class="btn-tool" style="color:var(--red)" onclick="resetarSistema()">🧨 LIMPAR</button>
+        <button class="btn-tool" onclick="alert('Na Memória: ' + db.ciclo.length + ' grupos e ' + db.viciadas.length + ' dezenas.')">👁️ STATUS</button>
+        <button class="btn-tool" style="color:var(--red)" onclick="resetarSistema()">🧨 ZERAR</button>
     </div>
 
     <div class="card">
-        <h3>📊 BANCO DE DADOS</h3>
-        <textarea id="txtAt" placeholder="Ciclo (Atrasados)..."></textarea>
-        <textarea id="txtVi" style="margin-top:5px; border-color:var(--blue)" placeholder="Dezenas Viciadas..."></textarea>
+        <h3>📊 ENTRADA (LIMPA APÓS GERAR)</h3>
+        <textarea id="txtAt" placeholder="Novos Grupos Atrasados..."></textarea>
+        <textarea id="txtVi" style="margin-top:5px; border-color:var(--blue)" placeholder="Novas Dezenas Viciadas..."></textarea>
     </div>
 
     <div class="card">
-        <h3>🕒 RESULTADOS DO DIA</h3>
+        <h3>🕒 RESULTADOS</h3>
         <div class="h-grid">
             <input type="number" id="h1" placeholder="COR">
             <input type="number" id="h2" placeholder="PPT">
@@ -46,28 +47,23 @@
             <input type="number" id="h5" placeholder="PTV">
             <input type="number" id="h6" placeholder="PTN">
         </div>
-        <input type="text" id="txtEx" style="margin-top:8px; font-size:12px;" placeholder="Dezenas para Excluir hoje">
     </div>
 
-    <button class="btn-exec" onclick="processarGeral()">GERAR JOGOS (V13.9)</button>
+    <button class="btn-exec" onclick="processarGeral()">GERAR JOGOS & LIMPAR</button>
 
     <div id="painelPalpite" class="panel">
-        <h3 style="color:var(--green)">🎯 PALPITES TÉCNICOS (SEM REPETIÇÃO)</h3>
+        <h3 style="color:var(--green)">🎯 PALPITES v14.1</h3>
         <div id="gridPalpites"></div>
     </div>
 </div>
 
 <script>
-    let db = { ciclo: [], viciadas: "" };
-    const KEY = "SABA_GOLD_139";
+    let db = { ciclo: [], viciadas: [] };
+    const KEY = "SABA_V14_1_MASTER";
 
     function carregarDB() {
-        const d = localStorage.getItem(KEY);
-        if(d) {
-            db = JSON.parse(d);
-            document.getElementById('txtAt').value = db.ciclo.join(" ");
-            document.getElementById('txtVi').value = db.viciadas || "";
-        }
+        const data = localStorage.getItem(KEY);
+        if(data) db = JSON.parse(data);
     }
 
     function getG(d) {
@@ -82,33 +78,45 @@
     }
 
     function processarGeral() {
-        // Captura e Salva no DB Local
-        let at = (document.getElementById('txtAt').value.match(/\d+/g) || []).map(Number);
-        if(at.length > 0) db.ciclo = [...new Set(at)];
-        db.viciadas = document.getElementById('txtVi').value;
+        // 1. Captura e Atualiza Memória
+        let valAt = document.getElementById('txtAt').value;
+        let valVi = document.getElementById('txtVi').value;
 
-        // Processa Resultados h1-h6
+        if(valAt.trim() !== "") db.ciclo = [...new Set((valAt.match(/\d+/g) || []).map(Number))];
+        if(valVi.trim() !== "") db.viciadas = [...new Set((valVi.match(/\d+/g) || []).map(Number))];
+
+        // 2. Processa Resultados h1-h6
         for(let i=1; i<=6; i++) {
-            let v = parseInt(document.getElementById('h'+i).value);
-            if(!isNaN(v)) { db.ciclo = db.ciclo.filter(x => x !== v); db.ciclo.push(v); }
-            document.getElementById('h'+i).value = "";
+            let el = document.getElementById('h'+i);
+            let v = parseInt(el.value);
+            if(!isNaN(v)) {
+                db.ciclo = db.ciclo.filter(x => x !== v);
+                db.ciclo.push(v);
+            }
+            el.value = ""; // Limpa input
         }
 
-        const viRaw = [...new Set((db.viciadas.match(/\d+/g) || []).map(Number))];
-        const jaSairam = (document.getElementById('txtEx').value.match(/\d+/g) || []).map(Number);
-        
-        let pool = viRaw.filter(d => !jaSairam.includes(d));
-        let topo = db.ciclo.slice(0, 10);
-        let lista = [...new Set([...pool.filter(d => topo.includes(getG(d))), ...pool])];
+        // Salva imediatamente
+        localStorage.setItem(KEY, JSON.stringify(db));
 
+        // 3. Validação de Segurança
+        if(db.viciadas.length < 3) {
+            alert("Erro: Insira dezenas viciadas primeiro.");
+            return;
+        }
+
+        // 4. Lógica de Geração
+        let topo = db.ciclo.slice(0, 10);
+        let lista = [...new Set([...db.viciadas.filter(d => topo.includes(getG(d))), ...db.viciadas])];
+        
         let html = "";
+        let tempLista = [...lista];
         for(let j=0; j<4; j++) {
-            if(lista.length < 3) break;
+            if(tempLista.length < 3) break;
             let jogo = [];
             let gps = [];
-            
-            while(jogo.length < 3 && lista.length > 0) {
-                let d = lista.shift();
+            while(jogo.length < 3 && tempLista.length > 0) {
+                let d = tempLista.shift();
                 let g = getG(d);
                 if(jogo.includes(d) || gps.includes(g)) d = aplicarEspelho(d);
                 jogo.push(d);
@@ -117,33 +125,53 @@
             html += `<div class="t-item">JOGO ${j+1}: ${jogo.map(n=>n.toString().padStart(2,'0')).join(' - ')}</div>`;
         }
 
+        // 5. Interface e Limpeza Final
         document.getElementById('painelPalpite').style.display = 'block';
         document.getElementById('gridPalpites').innerHTML = html;
+        document.getElementById('txtAt').value = "";
+        document.getElementById('txtVi').value = "";
         
-        // Atualiza campos e Salva
-        document.getElementById('txtAt').value = db.ciclo.join(" ");
-        localStorage.setItem(KEY, JSON.stringify(db));
-        alert("Dados Sincronizados e Salvos!");
+        alert("Sucesso! Jogos gerados e campos limpos.");
     }
 
     function fazerBackup() {
-        db.viciadas = document.getElementById('txtVi').value; // Garante que pegou o texto atual
+        if(db.ciclo.length === 0 && db.viciadas.length === 0) {
+            alert("Nada para exportar.");
+            return;
+        }
         const b = new Blob([JSON.stringify(db)], {type: "application/json"});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "BACKUP_SABA_TOTAL.json"; a.click();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(b);
+        a.download = "SABA_DATABASE.json";
+        a.click();
     }
 
     function restaurarBackup(e) {
+        const file = e.target.files[0];
+        if(!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
-            db = JSON.parse(ev.target.result);
-            localStorage.setItem(KEY, JSON.stringify(db));
-            alert("✅ TUDO RESTAURADO!");
-            location.reload();
+            try {
+                const data = JSON.parse(ev.target.result);
+                if(data.ciclo && data.viciadas) {
+                    db = data;
+                    localStorage.setItem(KEY, JSON.stringify(db));
+                    alert("✅ TUDO RESTAURADO!");
+                    location.reload();
+                } else {
+                    alert("Arquivo com formato inválido.");
+                }
+            } catch(err) { alert("Erro ao ler arquivo."); }
         };
-        reader.readAsText(e.target.files[0]);
+        reader.readAsText(file);
     }
 
-    function resetarSistema() { if(confirm("Apagar tudo?")) { localStorage.removeItem(KEY); location.reload(); } }
+    function resetarSistema() {
+        if(confirm("Isso apagará todo o histórico. Confirmar?")) {
+            localStorage.removeItem(KEY);
+            location.reload();
+        }
+    }
 </script>
 </body>
 </html>
